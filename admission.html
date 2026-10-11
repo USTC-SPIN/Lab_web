@@ -393,6 +393,99 @@
         align-items: flex-start;
       }
     }
+
+  button.btn {
+    font-family: inherit;
+    font-size: 1rem;
+  }
+
+  body.ug-modal-open {
+    overflow: hidden;
+  }
+
+  .ug-modal[hidden] {
+    display: none;
+  }
+
+  .ug-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+
+  .ug-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(17, 24, 39, 0.55);
+  }
+
+  .ug-modal-dialog {
+    position: relative;
+    width: min(680px, 100%);
+    max-height: min(82vh, 760px);
+    overflow: auto;
+    background: #fff;
+    border-radius: var(--card-radius);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+    padding: 32px 36px 28px;
+  }
+
+  .ug-modal-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 50%;
+    background: var(--light-gray);
+    color: var(--secondary-color);
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .ug-modal-close:hover {
+    background: var(--mid-gray);
+  }
+
+  .ug-modal-dialog h2 {
+    margin: 0 0 1.25rem;
+    padding-right: 2rem;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+  }
+
+  .ug-modal-dialog ol,
+  .ug-modal-dialog ul {
+    margin: 0;
+    padding-left: 1.25rem;
+  }
+
+  .ug-modal-dialog ol {
+    margin-bottom: 1.5rem;
+  }
+
+  .ug-modal-dialog li {
+    margin-bottom: 0.85rem;
+    line-height: 1.7;
+  }
+
+  .ug-modal-dialog h3 {
+    margin: 0 0 0.75rem;
+    font-size: 1.1rem;
+  }
+
+
+  @media (max-width: 768px) {
+    .ug-modal-dialog {
+      padding: 28px 20px 22px;
+    }
+  }
   </style>
 </head>
 
@@ -508,7 +601,7 @@
                 <li>优秀者可推荐攻读研究生</li>
                 <li>培养学术研究和创新能力</li>
               </ul>
-              <a href="#application" class="btn">申请要求</a>
+              <button type="button" class="btn" id="ug-requirements-open">申请要求</button>
             </div>
           </div>
         </div>
@@ -701,9 +794,61 @@
     </div>
   </footer>
 
+  <div id="ug-requirements-modal" class="ug-modal" hidden>
+    <div class="ug-modal-backdrop" data-ug-close></div>
+    <div class="ug-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="ug-requirements-title">
+      <button type="button" class="ug-modal-close" data-ug-close aria-label="关闭">&times;</button>
+      <h2 id="ug-requirements-title">申请要求</h2>
+      <ol>
+        <li><strong>简短自我介绍：</strong> 说明研究兴趣、相关经历，以及为什么希望加入我们的研究。</li>
+        <li><strong>论文阅读：</strong> 至少阅读一篇实验室成员参与的论文，简要介绍你的理解，并提出自己的思考、疑问或改进想法。不需要复述摘要，鼓励独立思考。</li>
+        <li><strong>时间投入：</strong> 说明每周可投入的时间，以及预计能够持续参与的周期。</li>
+        <li><strong>申请材料：</strong> 附上个人简历（CV）和成绩单，有代表性项目或 GitHub 也可以附上。</li>
+      </ol>
+      <h3>其他说明</h3>
+      <ul>
+        <li>邮件正文尽量简洁，详细经历放在简历中即可。</li>
+        <li>可以使用 AI 辅助理解论文，但希望看到自己的思考，而非 AI 生成的套话。</li>
+        <li>后续交流可能需要结合简历进行三分钟自我介绍，并讨论论文或相关项目。</li>
+      </ul>
+    </div>
+  </div>
+
   <!-- JavaScript -->
   <script src="js/script.js"></script>
-  <script src="js/i18n.js?v=20260828c"></script>
+  <script src="js/i18n.js?v=20261011c"></script>
+  <script>
+    (function () {
+      var modal = document.getElementById('ug-requirements-modal');
+      var openBtn = document.getElementById('ug-requirements-open');
+      if (!modal || !openBtn) return;
+
+      var lastFocus = null;
+
+      function openModal() {
+        lastFocus = document.activeElement;
+        modal.hidden = false;
+        document.body.classList.add('ug-modal-open');
+        var closeBtn = modal.querySelector('.ug-modal-close');
+        if (closeBtn) closeBtn.focus();
+      }
+
+      function closeModal() {
+        if (modal.hidden) return;
+        modal.hidden = true;
+        document.body.classList.remove('ug-modal-open');
+        if (lastFocus && typeof lastFocus.focus === 'function') lastFocus.focus();
+      }
+
+      openBtn.addEventListener('click', openModal);
+      modal.addEventListener('click', function (event) {
+        if (event.target.closest('[data-ug-close]')) closeModal();
+      });
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') closeModal();
+      });
+    }());
+  </script>
 </body>
 
 </html>
